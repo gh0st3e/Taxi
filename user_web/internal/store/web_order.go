@@ -23,8 +23,8 @@ func (s *Store) CancelOrder(ctx context.Context, id int) error {
 	ctx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `UPDATE orders SET State=-1`
-	_, err := s.db.ExecContext(ctx, query)
+	query := `UPDATE orders SET State=-1 WHERE id=?`
+	_, err := s.db.ExecContext(ctx, query, id)
 
 	return err
 }
