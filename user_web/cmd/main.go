@@ -1,11 +1,10 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"taxi/internal/db"
-	"taxi/internal/entity"
+	"taxi/internal/handler"
 	"taxi/internal/service"
 	"taxi/internal/store"
 )
@@ -21,14 +20,12 @@ func main() {
 
 	taxiStore := store.NewStore(db)
 	taxiService := service.NewService(logger, taxiStore)
+	taxiHandler := handler.NewHandler(logger, taxiService)
+	server := gin.New()
+	taxiHandler.Mount(server)
 
-	user := entity.User{
-		ID:       1,
-		Name:     "Denis",
-		Phone:    "",
-		Password: "",
-		Email:    "",
+	err = server.Run(":9000")
+	if err != nil {
+		logger.Fatalf("Couldn't run server: %s", err)
 	}
-
-	fmt.Println(taxiService.UpdateUser(context.TODO(), &user))
 }
