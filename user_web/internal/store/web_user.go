@@ -46,7 +46,7 @@ func (s *Store) GetOrders(ctx context.Context, userID, state int) ([]entity.Orde
 	ctx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `SELECT orders.id, orders.UserID, orders.FromCity, orders.ToCity, orders.Date, driver.name,driver.phone, car.model, car.lic_plate 
+	query := `SELECT orders.id, orders.UserID, orders.FromCity, orders.ToCity, orders.Date, driver.id, driver.name,driver.phone, car.id, car.model, car.lic_plate 
 				FROM orders 	
 				INNER JOIN driver ON orders.DriverID = driver.id 
 				INNER JOIN car ON orders.CarID = car.id
@@ -71,8 +71,10 @@ func (s *Store) GetOrders(ctx context.Context, userID, state int) ([]entity.Orde
 			&order.From,
 			&order.To,
 			&order.Date,
+			&driver.ID,
 			&driver.Name,
 			&driver.Phone,
+			&car.ID,
 			&car.Model,
 			&car.LicPlate)
 		if err != nil {
