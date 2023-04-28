@@ -38,7 +38,7 @@ func (h *Handler) Mount(r *gin.Engine) {
 	api.GET("/orders/:state", h.GetOrders)
 
 	api.POST("/order", h.Order)
-	api.DELETE("/order", h.CancelOrder)
+	api.DELETE("/order/:order", h.CancelOrder)
 }
 
 func (h *Handler) UserIdentity(ctx *gin.Context) {

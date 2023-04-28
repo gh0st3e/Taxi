@@ -10,7 +10,7 @@ func (s *Store) SignIn(ctx context.Context, phone, password string) (*entity.Use
 	defer cancel()
 
 	user := entity.User{}
-	query := `SELECT id,name,phone,password,email FROM user WHERE phone=? AND password=?`
+	query := `CALL SignIn(?,?)`
 	err := s.db.QueryRowContext(ctx, query, phone, password).
 		Scan(&user.ID,
 			&user.Name,
@@ -27,7 +27,7 @@ func (s *Store) SignUp(ctx context.Context, user entity.User) (int, error) {
 
 	var id int
 
-	insertQuery := `INSERT INTO user(name,phone,password,email) VALUES(?,?,?,?)`
+	insertQuery := `CALL SignUp(?,?,?,?)`
 	_, err := s.db.ExecContext(ctx, insertQuery,
 		user.Name,
 		user.Phone,
