@@ -11,7 +11,7 @@ func (s *Store) RetrieveByID(ctx context.Context, id int) (*entity.User, error) 
 
 	user := entity.User{}
 
-	query := `SELECT id,name,phone,password,email FROM user WHERE id=?`
+	query := `CALL RetrieveById(?);`
 	err := s.db.QueryRowContext(ctx, query, id).
 		Scan(&user.ID,
 			&user.Name,
@@ -26,7 +26,7 @@ func (s *Store) UpdateUser(ctx context.Context, user *entity.User) error {
 	ctx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `UPDATE user SET name=?,password=?,email=? WHERE id = ?`
+	query := `CALL UpdateUser(?,?,?,?)`
 	_, err := s.db.ExecContext(ctx, query, user.Name, user.Password, user.Email, user.ID)
 
 	return err
@@ -36,7 +36,7 @@ func (s *Store) DeleteUser(ctx context.Context, id int) error {
 	ctx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `DELETE FROM user WHERE id=?`
+	query := `CALL DeleteUser(?)`
 	_, err := s.db.ExecContext(ctx, query, id)
 
 	return err
@@ -46,11 +46,13 @@ func (s *Store) GetOrders(ctx context.Context, userID, state int) ([]entity.Orde
 	ctx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `SELECT orders.id, orders.UserID, orders.FromCity, orders.ToCity, orders.Date, driver.id, driver.name,driver.phone, car.id, car.model, car.lic_plate 
-				FROM orders 	
-				INNER JOIN driver ON orders.DriverID = driver.id 
-				INNER JOIN car ON orders.CarID = car.id
-				WHERE orders.UserID = ? AND orders.State = ?`
+	//query := `SELECT orders.id, orders.UserID, orders.FromCity, orders.ToCity, orders.Date, orders.State, driver.id, driver.name,driver.phone, car.id, car.model, car.lic_plate
+	//			FROM orders
+	//			INNER JOIN driver ON orders.DriverID = driver.id
+	//			INNER JOIN car ON orders.CarID = car.id
+	//			WHERE orders.UserID = ? AND orders.State = ?`
+
+	query := `CALL GetOrders(?,?)`
 
 	result, err := s.db.Query(query, userID, state)
 	if err != nil {
@@ -71,6 +73,7 @@ func (s *Store) GetOrders(ctx context.Context, userID, state int) ([]entity.Orde
 			&order.From,
 			&order.To,
 			&order.Date,
+			&order.State,
 			&driver.ID,
 			&driver.Name,
 			&driver.Phone,

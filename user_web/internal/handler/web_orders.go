@@ -62,18 +62,17 @@ func (h *Handler) Order(ctx *gin.Context) {
 }
 
 func (h *Handler) CancelOrder(ctx *gin.Context) {
-	orderID := ctx.Param("id")
-
-	idInt, err := strconv.Atoi(orderID)
+	orderID := ctx.Param("order")
+	idOrder, err := strconv.Atoi(orderID)
 	if err != nil {
-		h.logger.Errorf("handler.web_orders.CancelOrder couldn't get order with this id: %s", err)
+		h.logger.Errorf("handler.web_user.GetOrders couldn't get orders with this state: %s", err)
 		ctx.JSON(http.StatusNotFound, gin.H{
 			"error": fmt.Sprintf("error: %s", err),
 		})
 		return
 	}
 
-	err = h.service.CancelOrder(ctx, idInt)
+	err = h.service.CancelOrder(ctx, idOrder)
 	if err != nil {
 		h.logger.Errorf("handler.web_orders.CancelOrder couln't cancel order: %s", err)
 		ctx.JSON(http.StatusNotFound, gin.H{
