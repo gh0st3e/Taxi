@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><Manager></title>
+  <style>
+    table {
+      border-collapse: collapse; /* схлопнуть границы таблицы */
+      width: 100%;
+    }
+
+    td, th {
+      border: 1px solid black; /* добавить границы к ячейкам таблицы */
+      padding: 8px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2; /* сделать каждую четную строку серого цвета */
+    }
+
+  </style>
+</head>
+<body>
+<div id="userTable">
+
+</div>
+</body>
+<script>
+  GetDrivers()
+
+  let driverTable = document.getElementById('userTable')
+
+  function GetDrivers() {
+    console.log(`Get Users Stated`)
+    fetch(`http://localhost:9000/api/drivers`, {
+      method: `GET`, mode: "no-cors",
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
+    })
+            .then(responce => {
+              return responce.json()
+            })
+            .then((data) => {
+              console.log(data)
+
+              const driverTable = document.createElement('table');
+              const headerRow = document.createElement('tr');
+              headerRow.innerHTML = '<th>Id</th><th>Name</th><th>Phone</th><th>Working Experience</th>';
+              driverTable.appendChild(headerRow);
+
+              data.forEach((driver) =>{
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${driver.id}</td><td>${driver.name}</td><td>${driver.phone}</td><td>${driver.work_exp}</td>`;
+                driverTable.appendChild(row);
+              })
+              document.body.appendChild(driverTable);
+            })
+  }
+</script>
+</html>
