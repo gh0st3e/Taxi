@@ -32,7 +32,7 @@
 
     function GetUsers() {
         console.log(`Get Users Stated`)
-        fetch(`http://localhost:9000/user/get`, {
+        fetch(`http://localhost:9000/api/users`, {
             method: `GET`, mode: "no-cors",
             headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
         })
@@ -44,18 +44,16 @@
 
                 const userTable = document.createElement('table');
                 const headerRow = document.createElement('tr');
-                headerRow.innerHTML = '<th>Name</th><th>Phone</th><th>Email</th>';
+                headerRow.innerHTML = '<th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Telegram</th>';
                 userTable.appendChild(headerRow);
 
                 data.forEach((user) =>{
                     const row = document.createElement('tr');
-                    row.innerHTML = `<td>${user.name}</td><td>${user.phone}</td><td>${user.email}</td>`;
+                    row.innerHTML = `<td>${user.id}</td><td>${user.name}</td><td>${user.phone}</td><td>${user.email}</td><td>${user.telegram}</td>`;
                     userTable.appendChild(row);
                 })
                 document.body.appendChild(userTable);
             })
-
-
     }
 </script>
 </html>

@@ -1,2 +1,5 @@
 .idea
 manager_web/node_modules
+manager_web/logs
+dbfiles
+manager_web/.env
