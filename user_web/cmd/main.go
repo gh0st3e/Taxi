@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"taxi/internal/db"
@@ -19,6 +21,9 @@ func main() {
 	}
 
 	taxiStore := store.NewStore(db)
+
+	fmt.Println(taxiStore.DriverOrders(context.TODO(), 1, "05-04-2023"))
+
 	taxiService := service.NewService(logger, taxiStore)
 	taxiHandler := handler.NewHandler(logger, taxiService)
 	server := gin.New()

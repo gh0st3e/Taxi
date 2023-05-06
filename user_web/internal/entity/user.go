@@ -6,4 +6,5 @@ type User struct {
 	Phone    string
 	Password string
 	Email    string
+	Telegram string
 }

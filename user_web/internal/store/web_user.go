@@ -17,7 +17,8 @@ func (s *Store) RetrieveByID(ctx context.Context, id int) (*entity.User, error) 
 			&user.Name,
 			&user.Phone,
 			&user.Password,
-			&user.Email)
+			&user.Email,
+			&user.Telegram)
 
 	return &user, err
 }
@@ -69,10 +70,11 @@ func (s *Store) GetOrders(ctx context.Context, userID, state int) ([]entity.Orde
 
 		err := result.Scan(
 			&order.ID,
-			&order.UserID,
 			&order.From,
 			&order.To,
 			&order.Date,
+			&order.Time,
+			&order.Tickets,
 			&order.State,
 			&driver.ID,
 			&driver.Name,

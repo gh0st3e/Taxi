@@ -32,6 +32,7 @@ func (h *Handler) Mount(r *gin.Engine) {
 	r.POST("/user/create", h.SignUp)
 
 	api := r.Group("/api", h.UserIdentity)
+
 	api.GET("/user", h.RetrieveByID)
 	api.PUT("/user", h.UpdateUser)
 	api.DELETE("/user", h.DeleteUser)
@@ -39,6 +40,12 @@ func (h *Handler) Mount(r *gin.Engine) {
 
 	api.POST("/order", h.Order)
 	api.DELETE("/order/:order", h.CancelOrder)
+
+	driver := r.Group("/driver")
+
+	driver.POST("/login", h.DriverAuth)
+	driver.GET("/orders", h.DriverOrders)
+	driver.PUT("/status", h.ChangeStatus)
 }
 
 func (h *Handler) UserIdentity(ctx *gin.Context) {
