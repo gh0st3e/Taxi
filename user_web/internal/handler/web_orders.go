@@ -47,7 +47,7 @@ func (h *Handler) Order(ctx *gin.Context) {
 		return
 	}
 
-	order.UserID = idInt
+	order.User.ID = idInt
 
 	err = h.service.Order(ctx, &order)
 	if err != nil {

@@ -11,7 +11,7 @@ func (s *Store) Order(ctx context.Context, order *entity.Order) error {
 	//
 	query := `CALL AddOrder(?, ?, ?, ?);`
 	_, err := s.db.ExecContext(ctx, query,
-		order.UserID,
+		order.User.ID,
 		order.From,
 		order.To,
 		order.Date)

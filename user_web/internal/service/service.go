@@ -1,11 +1,14 @@
 package service
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/sirupsen/logrus"
+)
 
 type UserService interface {
 	UserAuth
 	UserActions
 	UserOrders
+	DriverActions
 }
 
 type Service struct {
