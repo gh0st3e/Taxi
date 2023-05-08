@@ -15,6 +15,13 @@ const (
 	signingKey = "ds1jlg3h245wp5oih432v"
 )
 
+type UserHandler interface {
+	UserAuth
+	UserActions
+	UserOrders
+	DriverActions
+}
+
 type Handler struct {
 	logger  *logrus.Logger
 	service *service.Service
@@ -44,8 +51,9 @@ func (h *Handler) Mount(r *gin.Engine) {
 	driver := r.Group("/driver")
 
 	driver.POST("/login", h.DriverAuth)
-	driver.GET("/orders", h.DriverOrders)
-	driver.PUT("/status", h.ChangeStatus)
+	driver.POST("/orders", h.DriverOrders)
+	driver.PUT("/state", h.ChangeStatus)
+
 }
 
 func (h *Handler) UserIdentity(ctx *gin.Context) {
