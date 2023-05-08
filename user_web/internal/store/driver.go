@@ -28,10 +28,10 @@ func (s *Store) DriverOrders(ctx context.Context, driverID int, date string) ([]
 	localCtx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `SELECT o.ID, o.FromCity, o.ToCity, o.Date, o.Time, o.Tickets, u.id, u.Name, u.Phone 
+	query := `SELECT o.ID, o.FromCity, o.ToCity, o.Date, o.Time, o.Tickets, o.State, u.id, u.Name, u.Phone 
 				FROM orders as o
 				INNER JOIN user as u ON o.UserID = u.ID
-				WHERE o.DriverID = ? AND o.date = ? AND o.state = 1`
+				WHERE o.DriverID = ? AND o.date = ?`
 
 	result, err := s.db.QueryContext(localCtx, query, driverID, date)
 	if err != nil {
@@ -52,6 +52,7 @@ func (s *Store) DriverOrders(ctx context.Context, driverID int, date string) ([]
 			&order.Date,
 			&order.Time,
 			&order.Tickets,
+			&order.State,
 			&user.ID,
 			&user.Name,
 			&user.Phone)
@@ -65,13 +66,13 @@ func (s *Store) DriverOrders(ctx context.Context, driverID int, date string) ([]
 	return orders, nil
 }
 
-func (s *Store) ChangeStatus(ctx context.Context, id int) error {
+func (s *Store) ChangeStatus(ctx context.Context, id, state int) error {
 	localCtx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `UPDATE orders SET state=2 WHERE ID = ?`
+	query := `UPDATE orders SET state=? WHERE ID = ?`
 
-	_, err := s.db.ExecContext(localCtx, query, id)
+	_, err := s.db.ExecContext(localCtx, query, state, id)
 
 	return err
 

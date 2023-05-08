@@ -10,12 +10,17 @@ import (
 type DriverActions interface {
 	DriverAuth(ctx context.Context, phone, password string) (entity.Driver, error)
 	DriverOrders(ctx context.Context, driverID int, date string) ([]entity.Order, error)
-	ChangeStatus(ctx context.Context, id int) error
+	ChangeStatus(ctx context.Context, id, state int) error
 }
 
 type OrdersRequest struct {
 	ID   int
 	Date string
+}
+
+type ChangeStateRequest struct {
+	ID    int
+	State int
 }
 
 func (h *Handler) DriverAuth(ctx *gin.Context) {
@@ -55,15 +60,15 @@ func (h *Handler) DriverOrders(ctx *gin.Context) {
 }
 
 func (h *Handler) ChangeStatus(ctx *gin.Context) {
-	ordersReq := OrdersRequest{}
+	changeStateReq := ChangeStateRequest{}
 
-	err := ctx.ShouldBindJSON(&ordersReq)
+	err := ctx.ShouldBindJSON(&changeStateReq)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = h.service.ChangeStatus(ctx, ordersReq.ID)
+	err = h.service.ChangeStatus(ctx, changeStateReq.ID, changeStateReq.State)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

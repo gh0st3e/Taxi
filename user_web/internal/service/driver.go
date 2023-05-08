@@ -8,7 +8,7 @@ import (
 type DriverActions interface {
 	DriverAuth(ctx context.Context, phone, password string) (entity.Driver, error)
 	DriverOrders(ctx context.Context, driverID int, date string) ([]entity.Order, error)
-	ChangeStatus(ctx context.Context, id int) error
+	ChangeStatus(ctx context.Context, id, state int) error
 }
 
 func (s *Service) DriverAuth(ctx context.Context, phone, password string) (entity.Driver, error) {
@@ -41,15 +41,15 @@ func (s *Service) DriverOrders(ctx context.Context, driverID int, date string) (
 	return orders, nil
 }
 
-func (s *Service) ChangeStatus(ctx context.Context, id int) error {
-	s.logger.Info("ChangeStatus started")
+func (s *Service) ChangeStatus(ctx context.Context, id, state int) error {
+	s.logger.Info("ConfirmDriverOrder started")
 
-	err := s.store.ChangeStatus(ctx, id)
+	err := s.store.ChangeStatus(ctx, id, state)
 	if err != nil {
-		s.logger.Errorf("Error, while ChangeStatus: %s", err)
+		s.logger.Errorf("Error, while ConfirmOrder: %s", err)
 		return err
 	}
-	s.logger.Info("ChangeStatus ended")
+	s.logger.Info("ConfirmDriverOrder ended")
 
 	return nil
 }
