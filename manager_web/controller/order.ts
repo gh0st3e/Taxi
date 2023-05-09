@@ -47,8 +47,8 @@ orderRouter.get("/api/ordersd/:state", async (req, res) => {
 
 orderRouter.put("/api/orders", async (req, res) => {
     try {
-        const {orderID, driverID, carID, date, time} = req.body;
-        await OrderService.UpdateOrder(orderID, driverID, carID, date, time); // вызываем функцию обновления заказа
+        const {orderID, driverID, carID} = req.body;
+        await OrderService.UpdateOrder(orderID, driverID, carID); // вызываем функцию обновления заказа
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({message: 'Order updated successfully'}));

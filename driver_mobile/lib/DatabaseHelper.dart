@@ -82,9 +82,9 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> deleteOrders() async {
+  Future<int> deleteOrders(String date) async {
     final db = await database;
-    return db.delete('Orders');
+    return db.delete('Orders', where: 'date = ?', whereArgs: [date]);
   }
 
   Future<int> updateOrder(int orderID, int state) async {

@@ -1,6 +1,6 @@
 import connection from "../config/db.config";
 import {MysqlError} from "mysql";
-import { RowDataPacket } from 'mysql2';
+import {RowDataPacket} from 'mysql2';
 
 interface User {
     id: number;
@@ -13,11 +13,11 @@ interface User {
 
 async function GetAllUsers(): Promise<User[] | Error> {
     return new Promise((resolve, reject) => {
-        connection.query("SELECT * FROM user", (err: MysqlError | null, result: RowDataPacket[]) => {
+        connection.query("CALL GetAllUsers()", (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
                 reject(err);
             } else {
-                const users: User[] = result.map(row => ({
+                const users: User[] = result[0].map((row: any) => ({
                     id: row.id,
                     name: row.name,
                     phone: row.phone,

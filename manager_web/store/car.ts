@@ -10,11 +10,12 @@ interface Car {
 
 async function GetAllCars(): Promise<Car[] | Error> {
     return new Promise((resolve, reject) => {
-        connection.query("SELECT id,model,lic_plate FROM car", (err: MysqlError | null, result: RowDataPacket[]) => {
+        connection.query("CALL GetAllCars()", (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
                 reject(err);
             } else {
-                const cars: Car[] = result.map(row => ({
+                console.log(result)
+                const cars: Car[] = result[0].map((row: any) => ({
                     id: row.id,
                     model: row.model,
                     licPlate: row.lic_plate,
@@ -27,8 +28,7 @@ async function GetAllCars(): Promise<Car[] | Error> {
 
 async function InsertCar(model: string, lic_plate: string): Promise<void> {
     return new Promise((resolve, reject) => {
-        const query = `INSERT INTO car(model, lic_plate)
-                       VALUES (?, ?)`
+        const query = `CALL InsertCar(?,?)`
         connection.query(query, [model, lic_plate], (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
                 reject(err);
@@ -41,10 +41,7 @@ async function InsertCar(model: string, lic_plate: string): Promise<void> {
 
 async function UpdateCar(id: number, model: string, lic_plate: string): Promise<void> {
     return new Promise((resolve, reject) => {
-        const query = `UPDATE car
-                       SET model=?,
-                           lic_plate=?
-                       WHERE id = ?`
+        const query = `CALL UpdateCar(?,?,?)`
         connection.query(query, [model, lic_plate, id],
             (err: MysqlError | null) => {
                 if (err) {
@@ -58,7 +55,7 @@ async function UpdateCar(id: number, model: string, lic_plate: string): Promise<
 
 async function DeleteCar(id: number): Promise<void> {
     return new Promise((resolve, reject) => {
-        const query = 'DELETE FROM car WHERE id=?'
+        const query = 'CALL DeleteCar(?)'
         connection.query(query, id, (err: MysqlError | null) => {
             if (err) {
                 reject(err)
