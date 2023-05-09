@@ -19,7 +19,7 @@
             background-color: #f2f2f2;
         }
 
-        #userTable{
+        #userTable {
             overflow-y: scroll;
         }
 
@@ -58,6 +58,15 @@
     <label for="car-id">Car ID:</label>
     <input type="number" id="car-id" name="carID" required><br><br>
 
+    <label for="date">Date:</label>
+    <input type="date" id="date" name="date" required><br><br>
+
+    <label for="time">Time:</label>
+    <input type="time" id="time" name="time" required><br><br>
+
+    <label for="state">State:</label>
+    <input type="number" id="state" name="state" required><br><br>
+
     <input type="submit" value="Update Order">
 </form>
 
@@ -66,10 +75,18 @@
     <div id="carTable"></div>
 </div>
 
-
+<label for="state-select">Select Order State:</label>
+<select id="state-select">
+    <option value="0">non-confirmed</option>
+    <option value="1">confirmed</option>
+    <option value="2">done</option>
+    <option value="-1">canceled</option>
+</select>
 <div id="userTable"></div>
 
 <script>
+    const stateSelect = document.getElementById('state-select');
+    stateSelect.addEventListener('change', GetOrders);
     const form = document.getElementById('update-order-form');
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -77,12 +94,15 @@
         const orderID = parseInt(form.elements['orderID'].value);
         const driverID = parseInt(form.elements['driverID'].value);
         const carID = parseInt(form.elements['carID'].value);
+        const date = form.elements['date'].value;
+        const time = form.elements['time'].value;
+        const state = form.elements['state'].value;
 
 
         const response = await fetch('http://localhost:9000/api/orders', {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({orderID, driverID, carID})
+            body: JSON.stringify({orderID, driverID, carID, date, time, state})
         });
 
         if (response.ok) {
@@ -99,8 +119,9 @@
 
     function GetOrders() {
         console.log(`Get Users Started`);
+        const state = stateSelect.value;
 
-        fetch(`http://localhost:9000/api/orders/0`, {
+        fetch(`http://localhost:9000/api/orders/${state}`, {
             method: `GET`, mode: "no-cors",
             headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
         })
