@@ -15,10 +15,10 @@ const GetAllOrders = async (state: string) => {
     }
 }
 
-const UpdateOrder = async (orderID: number, driverID: number, carID: number) => {
+const UpdateOrder = async (orderID: number, driverID: number, carID: number, date: string, time: string, state: number) => {
     logger.info("[UpdateOrder] started")
     try {
-        const res = await OrderStore.UpdateOrder(orderID, driverID, carID);
+        const res = await OrderStore.UpdateOrder(orderID, driverID, carID, date, time, state);
         logger.info(res);
         logger.info("[UpdateOrder] ended")
         return res;

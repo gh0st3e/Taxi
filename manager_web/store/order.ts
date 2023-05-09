@@ -37,10 +37,10 @@ async function GetAllOrders(state: number): Promise<Order[] | Error> {
     });
 }
 
-async function UpdateOrder(orderID: number, driverID: number, carID: number): Promise<void> {
+async function UpdateOrder(orderID: number, driverID: number, carID: number, date: string, time: string, state: number): Promise<void> {
     return new Promise((resolve, reject) => {
-        const query = "CALL UpdateManagerOrder(?,?,?)";
-        connection.query(query, [driverID, carID, orderID], (err: MysqlError | null, result: RowDataPacket[]) => {
+        const query = "CALL UpdateManagerOrder(?,?,?,?,?,?)";
+        connection.query(query, [driverID, carID, date, time, state, orderID], (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
                 reject(err);
             } else {
