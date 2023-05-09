@@ -1,59 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title><Manager></title>
-  <style>
-    table {
-      border-collapse: collapse; /* схлопнуть границы таблицы */
-      width: 100%;
-    }
+    <meta charset="UTF-8">
+    <title><Manager></title>
+    <style>
+        table {
+            border-collapse: collapse; /* схлопнуть границы таблицы */
+            width: 100%;
+        }
 
-    td, th {
-      border: 1px solid black; /* добавить границы к ячейкам таблицы */
-      padding: 8px;
-    }
+        td, th {
+            border: 1px solid black; /* добавить границы к ячейкам таблицы */
+            padding: 8px;
+        }
 
-    tr:nth-child(even) {
-      background-color: #f2f2f2; /* сделать каждую четную строку серого цвета */
-    }
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* сделать каждую четную строку серого цвета */
+        }
 
-  </style>
+        .form-container {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .form-container label {
+            display: inline-block;
+            width: 150px;
+        }
+
+        .form-container input[type="text"] {
+            width: 200px;
+        }
+
+        .form-container button {
+            margin-left: 150px;
+        }
+
+    </style>
 </head>
 <body>
-<div id="userTable">
-
+<div class="form-container">
+    <h3>Create Driver</h3>
+    <form>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" required><br><br>
+        <label for="password">Password:</label>
+        <input type="text" id="password" name="password" required><br><br>
+        <label for="work_exp">Working Experience:</label>
+        <input type="text" id="work_exp" name="work_exp" required><br><br>
+        <input type="button" value="Create" onclick="CreateDriver()"/>
+    </form>
 </div>
+<div class="form-container">
+    <h3>Update Driver</h3>
+    <form>
+        <label for="update_id">Id:</label>
+        <input type="text" id="update_id" name="id" required><br><br>
+        <label for="update_name">Name:</label>
+        <input type="text" id="update_name" name="name"><br><br>
+        <label for="update_phone">Phone:</label>
+        <input type="text" id="update_phone" name="phone"><br><br>
+        <label for="update_password">Phone:</label>
+        <input type="text" id="update_password" name="password"><br><br>
+        <label for="update_work_exp">Working Experience:</label>
+        <input type="text" id="update_work_exp" name="work_exp"><br><br>
+        <input type="button" value="Update" onclick="UpdateDriver()"/>
+    </form>
+</div>
+<div class="form-container">
+    <h3>Delete Driver</h3>
+    <form>
+        <label for="delete_id">Id:</label>
+        <input type="text" id="delete_id" name="id" required><br><br>
+        <input type="button" value="Delete" onclick="DeleteDriver()"/>
+    </form>
+</div>
+
+<div id="userTable"></div>
 </body>
 <script>
-  GetDrivers()
+    GetDrivers()
 
-  let driverTable = document.getElementById('userTable')
+    let Table = document.getElementById('userTable')
 
-  function GetDrivers() {
-    console.log(`Get Users Stated`)
-    fetch(`http://localhost:9000/api/drivers`, {
-      method: `GET`, mode: "no-cors",
-      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
-    })
+    function GetDrivers() {
+        console.log(`Get Users Stated`)
+        fetch(`http://localhost:9000/api/drivers`, {
+            method: `GET`, mode: "no-cors",
+            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        })
             .then(responce => {
-              return responce.json()
+                return responce.json()
             })
             .then((data) => {
-              console.log(data)
+                console.log(data)
 
-              const driverTable = document.createElement('table');
-              const headerRow = document.createElement('tr');
-              headerRow.innerHTML = '<th>Id</th><th>Name</th><th>Phone</th><th>Working Experience</th>';
-              driverTable.appendChild(headerRow);
+                const existingTable = Table.querySelector('table');
+                if (existingTable) {
+                    // если таблица уже существует, удаляем ее перед добавлением новой
+                    existingTable.remove();
+                }
 
-              data.forEach((driver) =>{
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${driver.id}</td><td>${driver.name}</td><td>${driver.phone}</td><td>${driver.work_exp}</td>`;
-                driverTable.appendChild(row);
-              })
-              document.body.appendChild(driverTable);
+                const driverTable = document.createElement('table');
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = '<th>Id</th><th>Name</th><th>Phone</th><th>Password</th><th>Working Experience</th>';
+                driverTable.appendChild(headerRow);
+
+                data.forEach((driver) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${driver.id}</td><td>${driver.name}</td><td>${driver.phone}</td><td>${driver.password}</td><td>${driver.work_exp}</td>`;
+                    driverTable.appendChild(row);
+                })
+                Table.appendChild(driverTable);
             })
-  }
+    }
+
+    function CreateDriver() {
+        // Получаем ссылки на текстовые поля формы
+        const nameField = document.getElementById('name')
+        const phoneField = document.getElementById('phone')
+        const passwordField = document.getElementById('password')
+        const workExpField = document.getElementById('work_exp')
+
+        // Получаем значение текстовых полей формы
+        const name = nameField.value
+        const phone = phoneField.value
+        const password = passwordField.value
+        const workExp = workExpField.value
+
+        // Создаем объект нового водителя
+        const newDriver = {name, phone, password, work_exp: workExp}
+
+        fetch('http://localhost:9000/api/drivers', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(newDriver)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to create new driver')
+                }
+                console.log('New driver created successfully')
+                // Обновляем таблицу водителей
+                GetDrivers()
+            })
+            .catch(error => {
+                alert(error)
+                console.error(error)
+            })
+        // Код создания нового водителя
+    }
+
+    function UpdateDriver() {
+        try {
+            // Получаем ссылки на текстовые поля формы
+            const idField = document.getElementById('update_id')
+            const nameField = document.getElementById('update_name')
+            const phoneField = document.getElementById('update_phone')
+            const passwordField = document.getElementById('update_password')
+            const workExpField = document.getElementById('update_work_exp')
+
+            // Получаем значение текстовых полей формы
+            const id = idField.value
+            const name = nameField.value
+            const phone = phoneField.value
+            const password = passwordField.value
+            const workExp = workExpField.value
+
+            // Создаем объект нового водителя
+            const newDriver = {id, name, phone, password, work_exp: workExp}
+
+            fetch('http://localhost:9000/api/drivers', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(newDriver)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to Update driver')
+                    }
+                    console.log('Driver updated successfully')
+                    // Обновляем таблицу водителей
+                    GetDrivers()
+                })
+                .catch(error => {
+                    alert(error)
+                    console.error(error)
+                })
+        } catch (err) {
+            alert(err)
+        }
+    }
+
+    function DeleteDriver() {
+        // Получаем ссылки на текстовые поля формы
+        const idField = document.getElementById('update_id')
+
+        // Получаем значение текстовых полей формы
+        const id = idField.value
+
+
+        // Создаем объект нового водителя
+        const deletedDriver = {id}
+
+        fetch('http://localhost:9000/api/drivers', {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(deletedDriver)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to Delete driver')
+                }
+                console.log('Driver deleted successfully')
+                // Обновляем таблицу водителей
+                GetDrivers()
+            })
+            .catch(error => {
+                alert(error)
+                console.error(error)
+            })
+    }
+
 </script>
 </html>

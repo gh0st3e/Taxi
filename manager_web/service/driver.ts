@@ -14,6 +14,48 @@ const GetAllDrivers = async () => {
     }
 }
 
+const InsertDriver = async (name: string, phone: string, password: string, work_exp: string) => {
+    logger.info("[InsertDriver] started")
+    try {
+        const res =  await DriverStore.InsertDriver(name, phone, password, work_exp)
+        logger.info(res)
+        logger.info("[InsertDriver] ended")
+        return res
+    } catch (err) {
+        logger.error(err)
+        throw err
+    }
+}
+
+const UpdateDriver = async (id: number, name: string, phone: string, password: string, work_exp: string) => {
+    logger.info("[UpdateDriver] started")
+    try {
+        const res = await DriverStore.UpdateDriver(id, name, phone, password, work_exp)
+        logger.info(res)
+        logger.info("[UpdateDriver] ended")
+        return res
+    } catch (err) {
+        logger.error(err)
+        throw err
+    }
+}
+
+const DeleteDriver = async (id: number) => {
+    logger.info("[DeleteDriver] started")
+    try {
+        const res = await DriverStore.DeleteDriver(id)
+        logger.info(res)
+        logger.info("[DeleteDriver] ended")
+        return res
+    } catch (err) {
+        logger.error(err)
+        throw err
+    }
+}
+
 export const DriverService = {
-    GetAllDrivers
+    GetAllDrivers,
+    InsertDriver,
+    UpdateDriver,
+    DeleteDriver
 }

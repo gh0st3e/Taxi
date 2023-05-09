@@ -15,7 +15,7 @@ async function GetAllUsers(): Promise<User[] | Error> {
     return new Promise((resolve, reject) => {
         connection.query("SELECT * FROM user", (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
-                reject(new Error('Failed to retrieve users.'));
+                reject(err);
             } else {
                 const users: User[] = result.map(row => ({
                     id: row.id,

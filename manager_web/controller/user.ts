@@ -9,10 +9,10 @@ userRouter.get("/api/users", async (req, res) => {
         res.statusCode = 200
         res.setHeader("Content-Type", "application/json")
         res.end(JSON.stringify(users))
-    } catch (err) {
+    } catch (err: any) {
         res.statusCode = 500
         res.setHeader("Content-Type", "application/json")
-        res.end(JSON.stringify(err))
+        res.end(JSON.stringify({ error: err.message }))
     }
 })
 
