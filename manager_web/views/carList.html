@@ -1,59 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title><Manager></title>
-  <style>
-    table {
-      border-collapse: collapse; /* схлопнуть границы таблицы */
-      width: 100%;
-    }
+    <meta charset="UTF-8">
+    <title><Manager></title>
+    <style>
+        table {
+            border-collapse: collapse; /* схлопнуть границы таблицы */
+            width: 100%;
+        }
 
-    td, th {
-      border: 1px solid black; /* добавить границы к ячейкам таблицы */
-      padding: 8px;
-    }
+        td, th {
+            border: 1px solid black; /* добавить границы к ячейкам таблицы */
+            padding: 8px;
+        }
 
-    tr:nth-child(even) {
-      background-color: #f2f2f2; /* сделать каждую четную строку серого цвета */
-    }
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* сделать каждую четную строку серого цвета */
+        }
 
-  </style>
+        .form-container {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .form-container label {
+            display: inline-block;
+            width: 150px;
+        }
+
+        .form-container input[type="text"] {
+            width: 200px;
+        }
+
+        .form-container button {
+            margin-left: 150px;
+        }
+
+    </style>
 </head>
 <body>
-<div id="userTable">
-
+<div class="form-container">
+    <h3>Create Car</h3>
+    <form>
+        <label for="model">Model:</label>
+        <input type="text" id="model" name="model" required><br><br>
+        <label for="lic_plate">LicPlate:</label>
+        <input type="text" id="lic_plate" name="lic_plate" required><br><br>
+        <input type="button" value="Create" onclick="CreateCar()"/>
+    </form>
 </div>
+<div class="form-container">
+    <h3>Update Car</h3>
+    <form>
+        <label for="update_id">Id:</label>
+        <input type="text" id="update_id" name="id" required><br><br>
+        <label for="update_model">Model:</label>
+        <input type="text" id="update_model" name="model"><br><br>
+        <label for="update_lic_plate">LicPlate:</label>
+        <input type="text" id="update_lic_plate" name="lic_plate"><br><br>
+        <input type="button" value="Update" onclick="UpdateCar()"/>
+    </form>
+</div>
+<div class="form-container">
+    <h3>Delete Car</h3>
+    <form>
+        <label for="delete_id">Id:</label>
+        <input type="text" id="delete_id" name="id" required><br><br>
+        <input type="button" value="Delete" onclick="DeleteCar()"/>
+    </form>
+</div>
+
+<div id="userTable"></div>
 </body>
 <script>
-  GetCars()
+    GetCars()
 
-  let carTable = document.getElementById('userTable')
+    let Table = document.getElementById('userTable')
 
-  function GetCars() {
-    console.log(`Get Users Stated`)
-    fetch(`http://localhost:9000/api/cars`, {
-      method: `GET`, mode: "no-cors",
-      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
-    })
+    function GetCars() {
+        console.log(`Get Users Stated`)
+        fetch(`http://localhost:9000/api/cars`, {
+            method: `GET`, mode: "no-cors",
+            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        })
             .then(responce => {
-              return responce.json()
+                return responce.json()
             })
             .then((data) => {
-              console.log(data)
+                console.log(data)
 
-              const carTable = document.createElement('table');
-              const headerRow = document.createElement('tr');
-              headerRow.innerHTML = '<th>ID</th><th>Model</th><th>LicPlate</th>';
-              carTable.appendChild(headerRow);
+                const existingTable = Table.querySelector('table');
+                if (existingTable) {
+                    // если таблица уже существует, удаляем ее перед добавлением новой
+                    existingTable.remove();
+                }
 
-              data.forEach((car) =>{
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${car.id}</td><td>${car.model}</td><td>${car.licPlate}</td>`;
-                carTable.appendChild(row);
-              })
-              document.body.appendChild(carTable);
+                const carTable = document.createElement('table');
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = '<th>ID</th><th>Model</th><th>LicPlate</th>';
+                carTable.appendChild(headerRow);
+
+                data.forEach((car) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${car.id}</td><td>${car.model}</td><td>${car.licPlate}</td>`;
+                    carTable.appendChild(row);
+                })
+                Table.appendChild(carTable);
             })
-  }
+    }
+
+    function CreateCar() {
+        try {
+            const modelField = document.getElementById('model')
+            const licPlateField = document.getElementById('lic_plate')
+
+            const model = modelField.value
+            const licPlate = licPlateField.value
+
+            const newCar = {model, lic_plate: licPlate}
+
+            fetch('http://localhost:9000/api/cars', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(newCar)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to create new car')
+                    }
+                    console.log('New car created successfully')
+
+                    GetCars()
+                })
+                .catch(error => {
+                    alert(error)
+                    console.error(error)
+                })
+        } catch (err) {
+            alert(err)
+        }
+    }
+
+    function UpdateCar() {
+        try {
+            const idField = document.getElementById('update_id')
+            const modelField = document.getElementById('update_model')
+            const licPlateField = document.getElementById('update_lic_plate')
+
+            const id = idField.value
+            const model = modelField.value
+            const licPlate = licPlateField.value
+
+            const newCar = {id, model, lic_plate: licPlate}
+
+            fetch('http://localhost:9000/api/cars', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(newCar)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to Update car')
+                    }
+                    console.log('Car updated successfully')
+
+                    GetCars()
+                })
+                .catch(error => {
+                    alert(error)
+                    console.error(error)
+                })
+        } catch (err) {
+            alert(err)
+        }
+    }
+
+    function DeleteCar() {
+        try {
+            const idField = document.getElementById('update_id')
+
+            const id = idField.value
+
+            const deleteCar = {id}
+
+            fetch('http://localhost:9000/api/cars', {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(deleteCar)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to Delete car')
+                    }
+                    console.log('Car deleted successfully')
+
+                    GetCars()
+                })
+                .catch(error => {
+                    alert(error)
+                    console.error(error)
+                })
+        } catch (err) {
+            alert(err)
+        }
+    }
+
 </script>
 </html>

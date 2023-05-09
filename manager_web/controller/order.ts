@@ -10,10 +10,10 @@ orderRouter.get("/api/orders/:state", async (req, res) => {
         res.statusCode = 200
         res.setHeader("Content-Type", "application/json")
         res.end(JSON.stringify(users))
-    } catch (err) {
+    } catch (err: any) {
         res.statusCode = 500
         res.setHeader("Content-Type", "application/json")
-        res.end(JSON.stringify(err))
+        res.end(JSON.stringify({ error: err.message }))
     }
 })
 
@@ -24,10 +24,10 @@ orderRouter.get("/api/ordersa/:state", async (req, res) => {
         res.statusCode = 200
         res.setHeader("Content-Type", "application/json")
         res.end(JSON.stringify(users))
-    } catch (err) {
+    } catch (err: any) {
         res.statusCode = 500
         res.setHeader("Content-Type", "application/json")
-        res.end(JSON.stringify(err))
+        res.end(JSON.stringify({ error: err.message }))
     }
 })
 
@@ -38,10 +38,10 @@ orderRouter.get("/api/ordersd/:state", async (req, res) => {
         res.statusCode = 200
         res.setHeader("Content-Type", "application/json")
         res.end(JSON.stringify(users))
-    } catch (err) {
+    } catch (err: any) {
         res.statusCode = 500
         res.setHeader("Content-Type", "application/json")
-        res.end(JSON.stringify(err))
+        res.end(JSON.stringify({ error: err.message }))
     }
 })
 
@@ -52,10 +52,10 @@ orderRouter.put("/api/orders", async (req, res) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({message: 'Order updated successfully'}));
-    } catch (err) {
+    } catch (err: any) {
         res.statusCode = 500
         res.setHeader("Content-Type", "application/json")
-        res.end(JSON.stringify(err))
+        res.end(JSON.stringify({ error: err.message }))
     }
 })
 

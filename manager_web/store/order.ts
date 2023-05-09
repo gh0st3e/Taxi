@@ -18,7 +18,7 @@ async function GetAllOrders(state: number): Promise<Order[] | Error> {
     return new Promise((resolve, reject) => {
         connection.query("SELECT * FROM orders WHERE STATE=?", state, (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
-                reject(new Error('Failed to retrieve orders.'));
+                reject(err);
             } else {
                 const orders: Order[] = result.map(row => ({
                     id: row.id,
@@ -42,7 +42,7 @@ async function UpdateOrder(orderID: number, driverID: number, carID: number, dat
         const query = "UPDATE orders SET driverID = ?, carID = ?, date = ?, time = ?, state = 1 WHERE orders.id = ?";
         connection.query(query, [driverID, carID, date, time, orderID], (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
-                reject(new Error(`Failed to update order with ID ${orderID}.`));
+                reject(err);
             } else {
                 resolve();
             }
@@ -54,7 +54,7 @@ async function GetAllOrdersDateA(state: number): Promise<Order[] | Error> {
     return new Promise((resolve, reject) => {
         connection.query("SELECT * FROM orders WHERE STATE=? ORDER BY orders.date ASC", state, (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
-                reject(new Error('Failed to retrieve orders.'));
+                reject(err);
             } else {
                 const orders: Order[] = result.map(row => ({
                     id: row.id,
@@ -77,7 +77,7 @@ async function GetAllOrdersDateD(state: number): Promise<Order[] | Error> {
     return new Promise((resolve, reject) => {
         connection.query("SELECT * FROM orders WHERE STATE=? ORDER BY orders.date DESC", state, (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
-                reject(new Error('Failed to retrieve orders.'));
+                reject(err);
             } else {
                 const orders: Order[] = result.map(row => ({
                     id: row.id,
