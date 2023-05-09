@@ -58,12 +58,6 @@
     <label for="car-id">Car ID:</label>
     <input type="number" id="car-id" name="carID" required><br><br>
 
-    <label for="date">Date:</label>
-    <input type="date" id="date" name="date" required><br><br>
-
-    <label for="time">Time:</label>
-    <input type="time" id="time" name="time" required><br><br>
-
     <input type="submit" value="Update Order">
 </form>
 
@@ -83,13 +77,12 @@
         const orderID = parseInt(form.elements['orderID'].value);
         const driverID = parseInt(form.elements['driverID'].value);
         const carID = parseInt(form.elements['carID'].value);
-        const date = form.elements['date'].value;
-        const time = form.elements['time'].value;
+
 
         const response = await fetch('http://localhost:9000/api/orders', {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({orderID, driverID, carID, date, time})
+            body: JSON.stringify({orderID, driverID, carID})
         });
 
         if (response.ok) {

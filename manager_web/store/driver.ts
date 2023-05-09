@@ -12,11 +12,11 @@ export interface Driver {
 
 async function GetAllDrivers(): Promise<Driver[] | Error> {
     return new Promise((resolve, reject) => {
-        connection.query("SELECT id,name,phone,password,work_exp FROM driver", (err: MysqlError | null, result: RowDataPacket[]) => {
+        connection.query("CALL GetAllDrivers()", (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
                 reject(err);
             } else {
-                const drivers: Driver[] = result.map(row => ({
+                const drivers: Driver[] = result[0].map((row: any) => ({
                     id: row.id,
                     name: row.name,
                     phone: row.phone,
@@ -31,8 +31,7 @@ async function GetAllDrivers(): Promise<Driver[] | Error> {
 
 async function InsertDriver(name: string, phone: string, password: string, work_exp: string): Promise<void> {
     return new Promise((resolve, reject) => {
-        const query = `INSERT INTO driver(name, phone, password, work_exp)
-                       VALUES (?, ?, ?, ?)`
+        const query = `CALL InsertDriver(?,?,?,?)`
         connection.query(query, [name, phone, password, work_exp], (err: MysqlError | null, result: RowDataPacket[]) => {
             if (err) {
                 reject(err);
@@ -45,12 +44,7 @@ async function InsertDriver(name: string, phone: string, password: string, work_
 
 async function UpdateDriver(id: number, name: string, phone: string, password: string, work_exp: string): Promise<void> {
     return new Promise((resolve, reject) => {
-        const query = `UPDATE driver
-                       SET name=?,
-                           phone=?,
-                           password=?,
-                           work_exp=?
-                       WHERE id = ?`
+        const query = `CALL UpdateDriver(?,?,?,?,?)`
         connection.query(query, [name, phone, password, work_exp, id],
             (err: MysqlError | null) => {
                 if (err) {
@@ -64,7 +58,7 @@ async function UpdateDriver(id: number, name: string, phone: string, password: s
 
 async function DeleteDriver(id: number): Promise<void> {
     return new Promise((resolve, reject) => {
-        const query = 'DELETE FROM driver WHERE id=?'
+        const query = 'CALL DeleteDriver(?)'
         connection.query(query, id, (err: MysqlError | null) => {
             if (err) {
                 reject(err)

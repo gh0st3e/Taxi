@@ -31,7 +31,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
 
 
-  void _getOrdersFromServer() async {
+  Future<void> _getOrdersFromServer() async {
     print(_selectedDate);
 
     final url = Uri.parse('http://10.0.2.2:9000/driver/orders');
@@ -65,13 +65,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }
   }
 
-  void _loadOrders() async {
+  Future<void> _loadOrders() async {
     _getOrdersFromServer();
     final dbHelper = DatabaseHelper.instance;
     final orders = await dbHelper.getAllOrders(_selectedDate);
     setState(() {
       _orders = orders;
     });
+  }
+
+  Future<void> deleteThisDay() async {
+    final dbHelper = DatabaseHelper.instance;
+    final res = dbHelper.deleteOrders(_selectedDate);
   }
 
   void _onDateSelected(String date) {
@@ -106,9 +111,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 Text(_selectedDate),
                 IconButton(
                   icon: Icon(Icons.refresh),
-                  onPressed: () {
-                    _getOrdersFromServer();
-                    _loadOrders();
+                  onPressed: () async {
+                    await deleteThisDay();
+                    await _getOrdersFromServer();
+                    await _loadOrders();
+                    setState(() {});
+
                   },
                 ),
                 IconButton(
@@ -185,8 +193,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   ),
                 );
               },
+
             ),
+
           ),
+
         ],
       ),
     );

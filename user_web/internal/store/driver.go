@@ -9,7 +9,7 @@ func (s *Store) DriverAuth(ctx context.Context, phone, password string) (entity.
 	localCtx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `SELECT * FROM driver WHERE phone=? AND password=?`
+	query := `CALL DriverAuth(?,?)`
 
 	driver := entity.Driver{}
 
@@ -28,10 +28,7 @@ func (s *Store) DriverOrders(ctx context.Context, driverID int, date string) ([]
 	localCtx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `SELECT o.ID, o.FromCity, o.ToCity, o.Date, o.Time, o.Tickets, o.State, u.id, u.Name, u.Phone 
-				FROM orders as o
-				INNER JOIN user as u ON o.UserID = u.ID
-				WHERE o.DriverID = ? AND o.date = ?`
+	query := `CALL GetDriverOrders(?,?)`
 
 	result, err := s.db.QueryContext(localCtx, query, driverID, date)
 	if err != nil {
@@ -70,7 +67,7 @@ func (s *Store) ChangeStatus(ctx context.Context, id, state int) error {
 	localCtx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
-	query := `UPDATE orders SET state=? WHERE ID = ?`
+	query := `CALL UpdatePassengerStatus(?,?)`
 
 	_, err := s.db.ExecContext(localCtx, query, state, id)
 
