@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Междугороднее такси</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px #888;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        nav a {
+            display: block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        nav a:hover {
+            color: #4CAF50;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #888;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        input[type="button"] {
+            background-color: #4CAF50;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        input[type="button"]:hover {
+            background-color: #3e8e41;
+        }
+
+        .error {
+            color: #f00;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">Междугороднее такси</div>
+    <nav>
+        <a href="http://localhost:9000/main">Главная</a>
+        <a href="http://localhost:9000/orders">Заказать</a>
+        <a href="http://localhost:9000/drivers">Водители</a>
+        <a href="http://localhost:9000/user">Личный кабинет</a>
+    </nav>
+</header>
+<h1>Заказать</h1>
+<form>
+    <label for="from">Откуда:</label>
+    <input type="text" id="from" name="from" required>
+    <label for="to">Куда:</label>
+    <input type="text" id="to" name="to" required>
+    <label for="date">Дата:</label>
+    <input type="date" id="date" name="date" required>
+    <label for="time">Время:</label>
+    <input type="time" id="time" name="time" required>
+    <label for="tickets">Количество билетов:</label>
+    <input type="number" id="tickets" name="tickets" min="1" max="3" value="1" required>
+    <input type="button" value="Заказать" onclick="makeOrder()">
+</form>
+</body>
+<script>
+
+
+    function makeOrder() {
+        const from = document.getElementById("from").value;
+        const to = document.getElementById("to").value;
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+        const quantity = document.getElementById("tickets").value;
+
+        const token = localStorage.getItem("accessToken");
+
+        // Отправляем данные на сервер
+        fetch("http://localhost:9000/api/order", {
+            method: "POST",
+            body: JSON.stringify({from, to, date, time, quantity}),
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json()
+                    //throw new Error("Ошибка запроса на сервер");
+                }
+                alert("Заказ успешно оформлен!");
+                // Очищаем поля формы
+                document.getElementById("from").value = "";
+                document.getElementById("to").value = "";
+                document.getElementById("date").value = "";
+                document.getElementById("time").value = "";
+                document.getElementById("tickets").value = 1;
+            })
+            .then(data => {
+                alert(data)
+            })
+            .catch(error => {
+                alert(error)
+                window.location.href = "http://localhost:9000/login"
+            });
+    }
+</script>
+</html>

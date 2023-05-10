@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Order</title>
+    <style>
+        table {
+
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid black;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #userTable {
+            overflow-y: scroll;
+        }
+
+        #driverTable {
+            width: 50%;
+            height: 150px;
+            overflow-y: scroll;
+        }
+
+        #carTable {
+            width: 50%;
+            height: 150px;
+            overflow-y: scroll;
+        }
+
+        #dc_table_fields {
+            height: 10%;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: nowrap;
+
+        }
+
+    </style>
+</head>
+<body>
+<h1>Update Order</h1>
+<form id="update-order-form">
+    <label for="order-id">Order ID:</label>
+    <input type="number" id="order-id" name="orderID" required><br><br>
+
+    <label for="driver-id">Driver ID:</label>
+    <input type="number" id="driver-id" name="driverID" required><br><br>
+
+    <label for="car-id">Car ID:</label>
+    <input type="number" id="car-id" name="carID" required><br><br>
+
+    <label for="date">Date:</label>
+    <input type="date" id="date" name="date" required><br><br>
+
+    <label for="time">Time:</label>
+    <input type="time" id="time" name="time" required><br><br>
+
+    <label for="state">State:</label>
+    <input type="number" id="state" name="state" required><br><br>
+
+    <input type="submit" value="Update Order">
+</form>
+
+<div id="dc_table_fields">
+    <div id="driverTable"></div>
+    <div id="carTable"></div>
+</div>
+
+<label for="state-select">Select Order State:</label>
+<select id="state-select">
+    <option value="0">non-confirmed</option>
+    <option value="1">confirmed</option>
+    <option value="2">done</option>
+    <option value="-1">canceled</option>
+</select>
+<div id="userTable"></div>
+
+<script>
+    const stateSelect = document.getElementById('state-select');
+    stateSelect.addEventListener('change', GetOrders);
+    const form = document.getElementById('update-order-form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const orderID = parseInt(form.elements['orderID'].value);
+        const driverID = parseInt(form.elements['driverID'].value);
+        const carID = parseInt(form.elements['carID'].value);
+        const date = form.elements['date'].value;
+        const time = form.elements['time'].value;
+        const state = form.elements['state'].value;
+
+
+        const response = await fetch('http://localhost:9000/api/orders', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({orderID, driverID, carID, date, time, state})
+        });
+
+        if (response.ok) {
+            alert('Order updated successfully');
+            GetOrders()
+        } else {
+            const errorData = await response.json();
+            alert(`Failed to update order. Error message: ${errorData.message}`);
+        }
+    });
+
+    let userTable = document.getElementById('userTable');
+
+
+    function GetOrders() {
+        console.log(`Get Users Started`);
+        const state = stateSelect.value;
+
+        fetch(`http://localhost:9000/api/orders/${state}`, {
+            method: `GET`, mode: "no-cors",
+            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        })
+            .then(response => {
+                return response.json()
+            })
+            .then((data) => {
+                console.log(data);
+
+                userTable.innerHTML = ''; // clear existing table
+
+                const orderTable = document.createElement('table');
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = '<th>ID</th><th>UserID</th><th>DriverID</th><th>CarID</th><th>FromCity</th><th>ToCity</th><th>Date</th><th>Tickets</th><th>State</th>';
+                orderTable.appendChild(headerRow);
+
+                data.forEach((order) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${order.id}</td><td>${order.userID}</td><td>${order.driverID}</td><td>${order.carID}</td>
+                            <td>${order.fromCity}</td><td>${order.toCity}</td><td>${order.date}</td><td>${order.tickets}</td><td>${order.state}</td>`;
+                    orderTable.appendChild(row);
+                })
+                userTable.appendChild(orderTable);
+            })
+            .catch((error) => {
+                console.log('Error:', error);
+            });
+    }
+
+    let driverTable = document.getElementById('driverTable');
+
+    function GetDrivers() {
+        console.log(`Get Users Stated`)
+        fetch(`http://localhost:9000/api/drivers`, {
+            method: `GET`, mode: "no-cors",
+            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        })
+            .then(responce => {
+                return responce.json()
+            })
+            .then((data) => {
+                console.log(data)
+
+                const localDriverTable = document.createElement('table');
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = '<th>Id</th><th>Name</th><th>Phone</th><th>Working Experience</th>';
+                localDriverTable.appendChild(headerRow);
+
+                data.forEach((driver) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${driver.id}</td><td>${driver.name}</td><td>${driver.phone}</td><td>${driver.work_exp}</td>`;
+                    localDriverTable.appendChild(row);
+                })
+                driverTable.appendChild(localDriverTable);
+            })
+    }
+
+    let carTable = document.getElementById('carTable')
+
+    function GetCars() {
+        console.log(`Get Users Stated`)
+        fetch(`http://localhost:9000/api/cars`, {
+            method: `GET`, mode: "no-cors",
+            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        })
+            .then(responce => {
+                return responce.json()
+            })
+            .then((data) => {
+                console.log(data)
+
+                const localCarTable = document.createElement('table');
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = '<th>ID</th><th>Model</th><th>LicPlate</th>';
+                localCarTable.appendChild(headerRow);
+
+                data.forEach((car) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${car.id}</td><td>${car.model}</td><td>${car.licPlate}</td>`;
+                    localCarTable.appendChild(row);
+                })
+                carTable.appendChild(localCarTable);
+            })
+    }
+
+    GetOrders()
+    GetDrivers()
+    GetCars()
+</script>
+</body>
+</html>
