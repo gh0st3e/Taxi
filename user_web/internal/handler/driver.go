@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"taxi/internal/entity"
 )
@@ -11,16 +12,12 @@ type DriverActions interface {
 	DriverAuth(ctx context.Context, phone, password string) (entity.Driver, error)
 	DriverOrders(ctx context.Context, driverID int, date string) ([]entity.Order, error)
 	ChangeStatus(ctx context.Context, id, state int) error
+	UpdateOrdersStatus(ctx context.Context, orders []entity.Order) error
 }
 
 type OrdersRequest struct {
 	ID   int
 	Date string
-}
-
-type ChangeStateRequest struct {
-	ID    int
-	State int
 }
 
 func (h *Handler) DriverAuth(ctx *gin.Context) {
@@ -60,7 +57,7 @@ func (h *Handler) DriverOrders(ctx *gin.Context) {
 }
 
 func (h *Handler) ChangeStatus(ctx *gin.Context) {
-	changeStateReq := ChangeStateRequest{}
+	changeStateReq := entity.ChangeStateRequest{}
 
 	err := ctx.ShouldBindJSON(&changeStateReq)
 	if err != nil {
@@ -69,6 +66,25 @@ func (h *Handler) ChangeStatus(ctx *gin.Context) {
 	}
 
 	err = h.service.ChangeStatus(ctx, changeStateReq.ID, changeStateReq.State)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "OK")
+}
+
+func (h *Handler) UpdateOrdersStatus(ctx *gin.Context) {
+	request := entity.ChangeManyStateRequest{}
+
+	err := ctx.ShouldBindJSON(&request)
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = h.service.UpdateOrdersStatus(ctx, request.Orders)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

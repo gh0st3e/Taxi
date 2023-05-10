@@ -12,3 +12,12 @@ type Order struct {
 	Tickets int
 	State   int
 }
+
+type ChangeStateRequest struct {
+	ID    int `json:"ID"`
+	State int `json:"State"`
+}
+
+type ChangeManyStateRequest struct {
+	Orders []ChangeStateRequest `json:"orders"`
+}

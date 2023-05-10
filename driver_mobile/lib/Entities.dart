@@ -7,12 +7,11 @@ class Driver {
   String password;
   int workExp;
 
-  Driver(
-      {required this.id,
-      required this.name,
-      required this.phone,
-      required this.password,
-      required this.workExp});
+  Driver({required this.id,
+    required this.name,
+    required this.phone,
+    required this.password,
+    required this.workExp});
 
   Map<String, dynamic> toMap() {
     return {
@@ -46,18 +45,19 @@ class Orders {
   int userID;
   String userName;
   String userPhone;
+  int driverID;
 
-  Orders(
-      {required this.id,
-      required this.fromCity,
-      required this.toCity,
-      required this.date,
-      required this.time,
-      required this.tickets,
-      required this.state,
-      required this.userID,
-      required this.userName,
-      required this.userPhone});
+  Orders({required this.id,
+    required this.fromCity,
+    required this.toCity,
+    required this.date,
+    required this.time,
+    required this.tickets,
+    required this.state,
+    required this.userID,
+    required this.userName,
+    required this.userPhone,
+    required this.driverID});
 
   factory Orders.fromJson(Map<String, dynamic> json) {
     return Orders(
@@ -70,7 +70,8 @@ class Orders {
         state: json["State"],
         userID: json['User']['ID'],
         userName: json['User']['Name'],
-        userPhone: json['User']['Phone']);
+        userPhone: json['User']['Phone'],
+        driverID: json['Driver']['ID']);
   }
 
   Map<String, dynamic> toMap() {
@@ -81,10 +82,43 @@ class Orders {
       'Date': date,
       'Time': time,
       'Tickets': tickets,
-      "State":state,
+      "State": state,
       'userID': userID,
       'userName': userName,
-      'userPhone': userPhone
+      'userPhone': userPhone,
+      'driverID': driverID
     };
+  }
+
+  Map<String, dynamic> toJSONMap() {
+    return {
+      'ID': id,
+      'State': state,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'orders': [toJSONMap()]};
+  }
+}
+
+class OrdersForUpdating {
+  int id;
+  int state;
+
+  OrdersForUpdating({
+    required this.id,
+    required this.state
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'ID': id,
+      "State": state,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'order': [toMap()]};
   }
 }

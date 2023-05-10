@@ -20,16 +20,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
   String _selectedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
   List<Orders> _orders = [];
 
-
-
   @override
   void initState() {
     super.initState();
     _getOrdersFromServer();
     _loadOrders();
   }
-
-
 
   Future<void> _getOrdersFromServer() async {
     print(_selectedDate);
@@ -38,7 +34,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final headers = {'Content-Type': 'application/json'};
     final data = {'id': widget.id, 'date': _selectedDate};
     final response =
-        await http.post(url, headers: headers, body: jsonEncode(data));
+    await http.post(url, headers: headers, body: jsonEncode(data));
 
     if (response.statusCode == 200) {
       print("OK");
@@ -52,9 +48,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
         }
       }
 
+      await deleteThisDay();
 
-
-// Вносим данные в базу данных
+      // Вносим данные в базу данных
       final dbHelper = DatabaseHelper.instance;
       for (var orders in ordersList) {
         await dbHelper.insertOrder(orders);
@@ -68,7 +64,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Future<void> _loadOrders() async {
     _getOrdersFromServer();
     final dbHelper = DatabaseHelper.instance;
-    final orders = await dbHelper.getAllOrders(_selectedDate);
+    final orders = await dbHelper.getAllOrders(_selectedDate, widget.id);
     setState(() {
       _orders = orders;
     });
@@ -86,6 +82,81 @@ class _OrdersScreenState extends State<OrdersScreen> {
     });
   }
 
+  Future<void> updateOrdersState() async {
+    try {
+      final dbHelper = DatabaseHelper.instance;
+
+      final url = Uri.parse('http://10.0.2.2:9000/driver/state');
+      final headers = {'Content-Type': 'application/json'};
+      List<OrdersForUpdating> orders = await dbHelper.getOrdersForUpdating(_selectedDate, widget.id);
+      List ordersList = orders.map((order) => order.toMap()).toList();
+      Map<String, dynamic> data = {'orders': ordersList};
+
+
+
+      print(jsonEncode(data));
+      final response =
+      await http.post(url, headers: headers, body: jsonEncode(data));
+
+
+      if (response.statusCode == 200) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Обновлено"),
+              content: Text("Статусы обновлены, спасибо"),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: Text("Закрыть"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Ошибка"),
+              content: Text("Статусы не обновлены, попробуй позже"),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: Text("Закрыть"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (err) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Ошибка"),
+            content: Text(err.toString()),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text("Закрыть"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,10 +171,16 @@ class _OrdersScreenState extends State<OrdersScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
+                  icon: Icon(Icons.refresh),
+                  onPressed: () async {
+                    await updateOrdersState();
+                  },
+                ),
+                IconButton(
                   icon: Icon(Icons.arrow_left),
                   onPressed: () {
                     final currentDate =
-                        DateFormat('dd-MM-yyyy').parse(_selectedDate);
+                    DateFormat('dd-MM-yyyy').parse(_selectedDate);
                     final newDate = currentDate.subtract(Duration(days: 1));
                     _onDateSelected(DateFormat('dd-MM-yyyy').format(newDate));
                   },
@@ -112,18 +189,16 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 IconButton(
                   icon: Icon(Icons.refresh),
                   onPressed: () async {
-                    await deleteThisDay();
                     await _getOrdersFromServer();
                     await _loadOrders();
                     setState(() {});
-
                   },
                 ),
                 IconButton(
                   icon: Icon(Icons.arrow_right),
                   onPressed: () {
                     final currentDate =
-                        DateFormat('dd-MM-yyyy').parse(_selectedDate);
+                    DateFormat('dd-MM-yyyy').parse(_selectedDate);
                     final newDate = currentDate.add(Duration(days: 1));
                     _onDateSelected(DateFormat('dd-MM-yyyy').format(newDate));
                   },
@@ -139,17 +214,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-
                       print(order.state.toString());
-
                     });
                   },
                   child: Container(
                     color: order.state == -1
                         ? Colors.red
                         : order.state == 1
-                            ? Colors.white
-                            : Colors.green,
+                        ? Colors.white
+                        : Colors.green,
                     // Если элемент выбран, устанавливаем зеленый цвет фона
                     child: ListTile(
                       title: Text('${order.fromCity} - ${order.toCity}'),
@@ -167,7 +240,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           onOrderStatusChanged(order.id, newStatus);
                         },
                         itemBuilder: (BuildContext context) =>
-                            <PopupMenuItem<int>>[
+                        <PopupMenuItem<int>>[
                           PopupMenuItem<int>(
                             value: -1,
                             child: Text('НЕ ПРИШЕЛ'),
@@ -193,11 +266,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   ),
                 );
               },
-
             ),
-
           ),
-
         ],
       ),
     );
@@ -207,11 +277,17 @@ class _OrdersScreenState extends State<OrdersScreen> {
     print(orderID);
     print(state);
 
+    final dbHelper = DatabaseHelper.instance;
+    int res = await dbHelper.updateOrder(orderID, state);
+    print(res);
+
+    _loadOrders();
+
     final url = Uri.parse('http://10.0.2.2:9000/driver/state');
     final headers = {'Content-Type': 'application/json'};
     final data = {'id': orderID, 'state': state};
     final response =
-        await http.put(url, headers: headers, body: jsonEncode(data));
+    await http.put(url, headers: headers, body: jsonEncode(data));
     if (response.statusCode == 200) {
       print("OK");
       print(response.body.toString());
@@ -219,13 +295,5 @@ class _OrdersScreenState extends State<OrdersScreen> {
       print("NOT OK");
       print(response.body.toString());
     }
-
-    final dbHelper = DatabaseHelper.instance;
-    int res = await dbHelper.updateOrder(orderID, state);
-    print(res);
-
-    _loadOrders();
   }
-
-
 }

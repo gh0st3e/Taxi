@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px #888;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        nav a {
+            display: block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        nav a:hover {
+            color: #4CAF50;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 0 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #888;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        input[type="button"] {
+            background-color: #4CAF50;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        input[type="button"]:hover {
+            background-color: #3e8e41;
+        }
+
+        .error {
+            color: #f00;
+            margin-top: 10px;
+        }
+
+        .password-wrapper {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">Междугороднее такси</div>
+    <nav>
+        <a href="http://localhost:9000/main">Главная</a>
+        <a href="http://localhost:9000/orders">Заказать</a>
+        <a href="http://localhost:9000/drivers">Водители</a>
+        <a href="http://localhost:9000/user">Личный кабинет</a>
+    </nav>
+</header>
+<h1>Личный кабинет</h1>
+<form>
+    <label for="name">Имя:</label>
+    <input type="text" id="name" name="name" required value="Иванов Иван">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required value="ivanov@mail.com">
+    <label for="telegram">Telegram:</label>
+    <input type="text" id="telegram" name="telegram" value="@ivanov">
+    <label for="password">Password:</label>
+    <div class="password-wrapper">
+        <input type="password" id="password" name="password" value="@ivanov">
+        <button type="button" onclick="togglePasswordVisibility()">Show</button>
+    </div>
+    <input type="button" value="Сохранить" onclick="EditUser()">
+</form>
+<div>
+    <label for="state-select">Select Order State:</label>
+    <select id="state-select">
+        <option value="0">non-confirmed</option>
+        <option value="1">confirmed</option>
+        <option value="2">done</option>
+        <option value="-1">canceled</option>
+    </select>
+</div>
+<h2>Информация о заказах</h2>
+<div id="userTable"></div>
+</body>
+<script>
+    const token = localStorage.getItem("accessToken")
+    const stateSelect = document.getElementById('state-select');
+    let userTable = document.getElementById('userTable');
+
+    function EditUser() {
+        uName = document.getElementById("name").value
+        uEmail = document.getElementById("email").value
+        uTg = document.getElementById("telegram").value
+        uPassword = document.getElementById("password").value
+
+        fetch("http://localhost:9000/api/user", {
+            method: "PUT",
+            body: JSON.stringify({name: uName, email: uEmail, telegram: uTg, password: uPassword}),
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ошибка запроса на сервер");
+                }
+                return response.json()
+                // Дополнительные действия после успешной регистрации
+            })
+            .then(data => {
+                window.location.href = "http://localhost:9000/user"
+
+            })
+            .catch(error => {
+
+                alert(error.message);
+            });
+
+    }
+
+    function togglePasswordVisibility() {
+        var passwordInput = document.getElementById("password");
+        var passwordWrapper = passwordInput.parentNode;
+        var passwordButton = passwordWrapper.getElementsByTagName("button")[0];
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            passwordButton.innerText = "Hide";
+        } else {
+            passwordInput.type = "password";
+            passwordButton.innerText = "Show";
+        }
+    }
+
+    function GetOrders() {
+        console.log(`Get Users Started`);
+        let path = 'http://localhost:9000/api/orders/0'
+        const state = stateSelect.value;
+        console.log(state)
+        if (state==0){
+            path = 'http://localhost:9000/api/orders/0'
+        }
+        if (state==1){
+            path = 'http://localhost:9000/api/orders/1'
+        }
+        if (state==-1){
+            path = 'http://localhost:9000/api/orders/-1'
+        }
+        if (state==2){
+            path = 'http://localhost:9000/api/orders/2'
+        }
+
+        console.log(path)
+
+        fetch(path, {
+            method: `GET`,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                return response.json()
+            })
+            .then((data) => {
+                console.log(data);
+
+                userTable.innerHTML = ''; // clear existing table
+
+                const orderTable = document.createElement('table');
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = '<th>From</th><th>To</th><th>Date</th><th>Time</th><th>Driver Name</th><th>Driver Phone</th><th>Car Model</th><th>Car Lic Plate</th><th>Tickets</th>';
+                orderTable.appendChild(headerRow);
+
+                data.forEach((order) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${order.From}</td><td>${order.To}</td><td>${order.Date}</td><td>${order.Time}</td>
+                <td>${order.Driver.Name}</td><td>${order.Driver.Phone}</td><td>${order.Car.Model}</td><td>${order.Car.LicPlate}</td><td>${order.Tickets}</td>`;
+                    const actionsCell = document.createElement('td');
+                    const cancelButton = document.createElement('button');
+                    cancelButton.innerText = 'Cancel Order';
+                    cancelButton.addEventListener('click', () => {
+                        CancelOrder(order.ID);
+                    });
+                    actionsCell.appendChild(cancelButton);
+
+                    row.appendChild(actionsCell);
+                    orderTable.appendChild(row);
+                })
+                userTable.appendChild(orderTable);
+            })
+            .catch((error) => {
+                console.log('Error:', error);
+            });
+    }
+
+    function CancelOrder(orderId) {
+
+        console.log(orderId)
+
+        let path = `http://localhost:9000/api/order/${orderId}`
+
+        fetch(path, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                // Handle the response from the server after canceling the order
+                console.log('Order canceled successfully');
+                // Refresh the orders table or update the UI as needed
+                GetOrders();
+            })
+            .catch((error) => {
+                console.log('Error:', error);
+            });
+    }
+
+    function FillData() {
+        fetch("http://localhost:9000/api/user", {
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ошибка запроса на сервер");
+                }
+                return response.json()
+                // Дополнительные действия после успешной регистрации
+            })
+            .then(data => {
+                console.log(data)
+
+                uName = document.getElementById("name")
+                uName.value = data.Name
+
+                uEmail = document.getElementById("email")
+                uEmail.value = data.Email
+
+                uTg = document.getElementById("telegram")
+                uTg.value = data.Telegram
+
+                uPassword = document.getElementById("password")
+                uPassword.value = data.Password
+
+            })
+            .catch(error => {
+                alert(error.message);
+                window.location.href = 'http://localhost:9000/login'
+
+            });
+
+    }
+
+    GetOrders()
+    FillData()
+
+    stateSelect.addEventListener('change', GetOrders);
+
+</script>
+</html>
