@@ -58,7 +58,8 @@ class DatabaseHelper {
         State INT,
         userID INTEGER,
         userName TEXT,
-        userPhone TEXT
+        userPhone TEXT,
+        driverID int
       )
     ''');
   }
@@ -71,6 +72,24 @@ class DatabaseHelper {
       conflictAlgorithm: ConflictAlgorithm
           .ignore, // добавлен параметр для обработки конфликтов
     );
+  }
+
+  Future<int> deleteDrivers() async {
+    final db = await database;
+    return db.delete('Driver');
+  }
+
+  Future<int> getLocalDriver() async {
+    final db = await database;
+
+    List<Map<String, dynamic>> results = await db.query('Driver', limit: 1);
+
+    if (results.isNotEmpty) {
+      int id = results[0]['id'];
+      return id;
+    } else {
+      return -1;
+    }
   }
 
   Future<int> insertOrder(Orders order) async {
@@ -91,18 +110,33 @@ class DatabaseHelper {
     final db = await database;
     return db.update(
       'Orders',
-      {'state': state}, // 1 if true, 0 if false
+      {'state': state},
       where: 'id = ?',
       whereArgs: [orderID],
     );
   }
 
-  Future<List<Orders>> getAllOrders(String date) async {
+  Future<List<OrdersForUpdating>> getOrdersForUpdating(String date, int driverID) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'Orders',
-      where: 'Date = ?',
-      whereArgs: [date],
+      where: 'Date = ? AND driverID=?',
+      whereArgs: [date, driverID],
+    );
+    return List.generate(maps.length, (i) {
+      return OrdersForUpdating(
+          id: maps[i]['id'],
+          state: maps[i]['State']);
+
+    });
+  }
+
+  Future<List<Orders>> getAllOrders(String date, int driverID) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'Orders',
+      where: 'Date = ? AND driverID=?',
+      whereArgs: [date, driverID],
     );
     return List.generate(maps.length, (i) {
       return Orders(
@@ -115,7 +149,8 @@ class DatabaseHelper {
           state: maps[i]['State'],
           userID: maps[i]['userID'],
           userName: maps[i]['userName'],
-          userPhone: maps[i]['userPhone']);
+          userPhone: maps[i]['userPhone'],
+          driverID: maps[i]['driverID']);
     });
   }
 }

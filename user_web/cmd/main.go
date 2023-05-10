@@ -27,6 +27,7 @@ func main() {
 	taxiService := service.NewService(logger, taxiStore)
 	taxiHandler := handler.NewHandler(logger, taxiService)
 	server := gin.New()
+	server.LoadHTMLGlob("front/*.html")
 	taxiHandler.Mount(server)
 
 	err = server.Run(":9000")

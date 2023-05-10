@@ -38,6 +38,13 @@ func (h *Handler) Mount(r *gin.Engine) {
 	r.POST("/user/login", h.SignIn)
 	r.POST("/user/create", h.SignUp)
 
+	r.GET("/login", h.loginHTML)
+	r.GET("/register", h.registerHTML)
+	r.GET("/main", h.mainHTML)
+	r.GET("/orders", h.ordersHTML)
+	r.GET("/user", h.userHTML)
+	r.GET("/drivers", h.driversHTML)
+
 	api := r.Group("/api", h.UserIdentity)
 
 	api.GET("/user", h.RetrieveByID)
@@ -53,6 +60,7 @@ func (h *Handler) Mount(r *gin.Engine) {
 	driver.POST("/login", h.DriverAuth)
 	driver.POST("/orders", h.DriverOrders)
 	driver.PUT("/state", h.ChangeStatus)
+	driver.POST("/state", h.UpdateOrdersStatus)
 
 }
 

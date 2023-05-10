@@ -41,6 +41,7 @@ func (s *Store) DriverOrders(ctx context.Context, driverID int, date string) ([]
 	for result.Next() {
 		order := entity.Order{}
 		user := entity.User{}
+		driver := entity.Driver{}
 
 		err := result.Scan(
 			&order.ID,
@@ -52,11 +53,13 @@ func (s *Store) DriverOrders(ctx context.Context, driverID int, date string) ([]
 			&order.State,
 			&user.ID,
 			&user.Name,
-			&user.Phone)
+			&user.Phone,
+			&driver.ID)
 		if err != nil {
 			return nil, err
 		}
 		order.User = user
+		order.Driver = driver
 		orders = append(orders, order)
 	}
 
@@ -73,4 +76,15 @@ func (s *Store) ChangeStatus(ctx context.Context, id, state int) error {
 
 	return err
 
+}
+
+func (s *Store) UpdateOrdersStatus(ctx context.Context, id, state int) error {
+	localCtx, cancel := context.WithTimeout(ctx, ctxTimeout)
+	defer cancel()
+
+	query := `UPDATE orders SET state=? WHERE id = ?`
+
+	_, err := s.db.ExecContext(localCtx, query, state, id)
+
+	return err
 }
