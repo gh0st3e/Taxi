@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -64,6 +65,8 @@ func (h *Handler) ChangeStatus(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	fmt.Println(changeStateReq)
 
 	err = h.service.ChangeStatus(ctx, changeStateReq.ID, changeStateReq.State)
 	if err != nil {

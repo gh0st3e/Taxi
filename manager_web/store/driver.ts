@@ -45,7 +45,7 @@ async function InsertDriver(name: string, phone: string, password: string, work_
 async function UpdateDriver(id: number, name: string, phone: string, password: string, work_exp: string): Promise<void> {
     return new Promise((resolve, reject) => {
         const query = `CALL UpdateDriver(?,?,?,?,?)`
-        connection.query(query, [name, phone, password, work_exp, id],
+        connection.query(query, [id, name, phone, password, work_exp],
             (err: MysqlError | null) => {
                 if (err) {
                     reject(err)

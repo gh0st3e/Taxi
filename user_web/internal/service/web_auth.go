@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/pkg/errors"
 	"strconv"
 	"taxi/internal/entity"
@@ -25,7 +26,7 @@ func (s *Service) SignIn(ctx context.Context, phone, password string) (accessTok
 	user, err := s.store.SignIn(ctx, phone, password)
 	if err != nil {
 		s.logger.Errorf("Error, while SignIn user: %s", err)
-		return "", "", errors.Wrap(err, "service.Login.NewAccessToken: Couldn't generate access token")
+		return "", "", fmt.Errorf("error, while SignIn user: %w", err)
 	}
 
 	s.logger.Info(user.ID)

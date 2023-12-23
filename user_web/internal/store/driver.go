@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"taxi/internal/entity"
 )
 
@@ -70,9 +71,11 @@ func (s *Store) ChangeStatus(ctx context.Context, id, state int) error {
 	localCtx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 
+	fmt.Println(state)
+
 	query := `CALL UpdatePassengerStatus(?,?)`
 
-	_, err := s.db.ExecContext(localCtx, query, state, id)
+	_, err := s.db.ExecContext(localCtx, query, id, state)
 
 	return err
 

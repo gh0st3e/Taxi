@@ -9,12 +9,14 @@ func (s *Store) Order(ctx context.Context, order *entity.Order) error {
 	ctx, cancel := context.WithTimeout(ctx, ctxTimeout)
 	defer cancel()
 	//
-	query := `CALL AddOrder(?, ?, ?, ?);`
+	query := `CALL AddOrder(?, ?, ?, ?, ?, ?);`
 	_, err := s.db.ExecContext(ctx, query,
 		order.User.ID,
 		order.From,
 		order.To,
-		order.Date)
+		order.Date,
+		order.Time,
+		order.Tickets)
 
 	return err
 }

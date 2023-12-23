@@ -42,7 +42,7 @@ async function InsertCar(model: string, lic_plate: string): Promise<void> {
 async function UpdateCar(id: number, model: string, lic_plate: string): Promise<void> {
     return new Promise((resolve, reject) => {
         const query = `CALL UpdateCar(?,?,?)`
-        connection.query(query, [model, lic_plate, id],
+        connection.query(query, [id, model, lic_plate],
             (err: MysqlError | null) => {
                 if (err) {
                     reject(err)

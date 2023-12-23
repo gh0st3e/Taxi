@@ -137,6 +137,8 @@ func (h *Handler) GetOrders(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Println(id)
+
 	idStr, ok := id.(string)
 	if !ok {
 		idStr = fmt.Sprintf("%s", id)
@@ -160,6 +162,8 @@ func (h *Handler) GetOrders(ctx *gin.Context) {
 		})
 		return
 	}
+
+	fmt.Println(idState)
 
 	orders, err := h.service.GetOrders(ctx, idInt, idState)
 	if err != nil {

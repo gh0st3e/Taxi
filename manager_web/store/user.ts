@@ -1,6 +1,6 @@
 import connection from "../config/db.config";
 import {MysqlError} from "mysql";
-import {RowDataPacket} from 'mysql2';
+import {RowDataPacket} from "mysql2"
 
 interface User {
     id: number;
